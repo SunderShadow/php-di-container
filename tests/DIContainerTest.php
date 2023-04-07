@@ -44,4 +44,21 @@ class DIContainerTest extends \PHPUnit\Framework\TestCase
         $output = $this->dependencies->get(\Dependency\Foo::class);
         $this->assertIsObject($output);
     }
+
+    public function test_call_without_parameters()
+    {
+        $this->dependencies->call(function ($alias) {
+            $this->assertEquals(1, $alias);
+        });
+    }
+
+    public function test_call_with_parameters()
+    {
+        $this->dependencies->call(function ($alias, $customParam) {
+            $this->assertEquals(1, $alias);
+            $this->assertEquals('param', $customParam);
+        }, [
+            'customParam' => 'param'
+        ]);
+    }
 }

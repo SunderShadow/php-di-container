@@ -57,6 +57,33 @@ class DI
     }
 
     /**
+     * Call function with auto injection
+     * @param callable $cb
+     * @param array $parameters
+     * @return mixed
+     * @throws ReflectionException
+     */
+    public function call(callable $cb, array $parameters = []): mixed
+    {
+        $reflection = new \ReflectionFunction($cb);
+
+        if (!$reflection->getParameters()) {
+            return $cb();
+        }
+
+        $parametersToResolve = [];
+        foreach ($reflection->getParameters() as $parameter) {
+            if (!in_array($parameter->getName(), array_keys($parameters))) {
+                $parametersToResolve[] = $parameter;
+            }
+        }
+
+        $resolvedParameters  = array_merge($this->resolveParameters($parametersToResolve), $parameters);
+
+        return $cb(...$resolvedParameters);
+    }
+
+    /**
      * Array of parameters
      * @param array $parameters
      * @return array
@@ -65,6 +92,7 @@ class DI
     private function resolveParameters(array $parameters): array
     {
         $resolvedParameters = [];
+
         foreach ($parameters as $parameter) {
             $name = $parameter->getName();
             $type = $parameter->getType();
