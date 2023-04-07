@@ -14,10 +14,10 @@ class DIContainerTest extends \PHPUnit\Framework\TestCase
         ]);
     }
 
-    public function test_isset()
+    public function test_has()
     {
-        $this->assertTrue($this->dependencies->isset('alias'));
-        $this->assertFalse($this->dependencies->isset('notDefinedDependency'));
+        $this->assertTrue($this->dependencies->has('alias'));
+        $this->assertFalse($this->dependencies->has('notDefinedDependency'));
     }
 
     public function test_make()

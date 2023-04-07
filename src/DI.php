@@ -2,9 +2,10 @@
 
 namespace Sunder\DI;
 
+use Psr\Container\ContainerInterface;
 use ReflectionException;
 
-class DI
+class DI implements ContainerInterface
 {
     /**
      * @var Dependency[]
@@ -18,17 +19,17 @@ class DI
         }
     }
 
-    public function isset(string $dependency): bool
+    public function has(string $id): bool
     {
-        return key_exists($dependency, $this->dependencies);
+        return key_exists($id, $this->dependencies);
     }
 
     /**
      * @throws ReflectionException
      */
-    public function get(string $dependency): mixed
+    public function get(string $id): mixed
     {
-        return $this->dependencies[$dependency]->get();
+        return $this->dependencies[$id]->get();
     }
 
     /**
