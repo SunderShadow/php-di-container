@@ -35,36 +35,36 @@ class DI implements ContainerInterface
     /**
      * @throws ReflectionException
      */
-    public function make(string $dependency): mixed
+    public function make(string $id): mixed
     {
-        return $this->dependencies[$dependency]->make();
+        return $this->dependencies[$id]->make();
     }
 
     /**
      * @template T
-     * @param class-string<T> $outerClass
+     * @param class-string<T> $outerClassname
      * @return T
      * @throws ReflectionException
      */
-    public function makeInstance(string $outerClass): mixed
+    public function makeInstance(string $outerClassname): mixed
     {
-        if (!$constructor = (new \ReflectionClass($outerClass))->getConstructor()) {
-            return new $outerClass;
+        if (!$constructor = (new \ReflectionClass($outerClassname))->getConstructor()) {
+            return new $outerClassname;
         }
 
         $parameters = $this->resolveParameters($constructor->getParameters());
 
-        return new $outerClass(...$parameters);
+        return new $outerClassname(...$parameters);
     }
 
     /**
      * Call function with auto injection
      * @param callable $cb
-     * @param array $parameters
+     * @param array $defaultParameters
      * @return mixed
      * @throws ReflectionException
      */
-    public function call(callable $cb, array $parameters = []): mixed
+    public function call(callable $cb, array $defaultParameters = []): mixed
     {
         $reflection = new \ReflectionFunction($cb);
 
@@ -74,27 +74,27 @@ class DI implements ContainerInterface
 
         $parametersToResolve = [];
         foreach ($reflection->getParameters() as $parameter) {
-            if (!in_array($parameter->getName(), array_keys($parameters))) {
+            if (!in_array($parameter->getName(), array_keys($defaultParameters))) {
                 $parametersToResolve[] = $parameter;
             }
         }
 
-        $resolvedParameters  = array_merge($this->resolveParameters($parametersToResolve), $parameters);
+        $resolvedParameters  = array_merge($this->resolveParameters($parametersToResolve), $defaultParameters);
 
         return $cb(...$resolvedParameters);
     }
 
     /**
      * Array of parameters
-     * @param array $parameters
+     * @param array $parametersToResolve
      * @return array
      * @throws ReflectionException
      */
-    private function resolveParameters(array $parameters): array
+    private function resolveParameters(array $parametersToResolve): array
     {
         $resolvedParameters = [];
 
-        foreach ($parameters as $parameter) {
+        foreach ($parametersToResolve as $parameter) {
             $name = $parameter->getName();
             $type = $parameter->getType();
 
