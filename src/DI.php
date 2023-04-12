@@ -66,7 +66,11 @@ class DI implements ContainerInterface
      */
     public function call(callable $cb, array $defaultParameters = []): mixed
     {
-        $reflection = new \ReflectionFunction($cb);
+        if (is_object($cb)) {
+            $reflection = new \ReflectionMethod($cb, '__invoke');
+        } else {
+            $reflection = new \ReflectionFunction($cb);
+        }
 
         if (!$reflection->getParameters()) {
             return $cb();
