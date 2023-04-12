@@ -10,7 +10,7 @@ class DI implements ContainerInterface
     /**
      * @var Dependency[]
      */
-    private array $dependencies;
+    protected array $dependencies;
 
     public function __construct(array $dependencies)
     {
